@@ -39,8 +39,9 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
-                    composable("login") { LoginScreen() }
-                    composable("signup") { SignUpScreen() }
+                    composable("login") { LoginScreen(navController) } // Tambahkan navController
+                    composable("signup") { SignUpScreen(navController) } // Tambahkan navController
+                    composable("dashboard") { DashboardScreen() } // Tidak perlu navController jika tidak ada navigasi lanjutan
                 }
             }
         }
@@ -132,7 +133,7 @@ fun MainContent(navController: NavController) {
 
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -164,7 +165,7 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Tambahkan aksi login */ },
+            onClick = { navController.navigate("dashboard") }, // Aksi untuk menuju Dashboard
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
@@ -174,11 +175,11 @@ fun LoginScreen() {
 }
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(navController: NavController) { // Tambahkan navController sebagai parameter
     val username = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val confirmPassword = remember { mutableStateOf("") } // Tambahkan state untuk Confirm Password
+    val confirmPassword = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -219,7 +220,6 @@ fun SignUpScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Field Confirm Password
         OutlinedTextField(
             value = confirmPassword.value,
             onValueChange = { confirmPassword.value = it },
@@ -232,9 +232,8 @@ fun SignUpScreen() {
 
         Button(
             onClick = {
-                // Tambahkan validasi jika password dan confirmPassword harus sama
                 if (password.value == confirmPassword.value) {
-                    // Lakukan aksi daftar
+                    navController.navigate("dashboard") // Navigasi ke Dashboard setelah pendaftaran berhasil
                 } else {
                     // Tampilkan error jika password tidak sesuai
                 }
@@ -244,6 +243,69 @@ fun SignUpScreen() {
         ) {
             Text("Daftar", color = Color.White)
         }
+    }
+}
+
+
+// Implementasi DashboardScreen
+@Composable
+fun DashboardScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = "Welcome to your Dashboard!",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(0xFF469C8F)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Contoh Card untuk informasi penting
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Your Recent Progress", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("You have completed 3 tasks today!")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Contoh menu item
+        Text(
+            text = "Tasks",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+        Text(
+            text = "Notes",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+        Text(
+            text = "Deadlines",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+    }
+}
+
+// Preview untuk DashboardScreen
+@Preview(showBackground = true)
+@Composable
+fun DashboardScreenPreview() {
+    TBPTBTheme {
+        DashboardScreen()
     }
 }
 
