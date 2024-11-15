@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.tbptb
 
 import android.os.Bundle
@@ -25,6 +27,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tbptb.ui.theme.TBPTBTheme
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -175,76 +180,136 @@ fun LoginScreen(navController: NavController) {
 }
 
 @Composable
-fun SignUpScreen(navController: NavController) { // Tambahkan navController sebagai parameter
-    val username = remember { mutableStateOf("") }
+fun SignUpScreen(navController: NavController) {
+    val name = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color(0xFF469C8F)) // Warna hijau untuk latar belakang penuh
     ) {
-        Text("Daftar Akun", style = MaterialTheme.typography.headlineMedium, color = Color(0xFF469C8F))
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = username.value,
-            onValueChange = { username.value = it },
-            label = { Text("Nama Pengguna") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = email.value,
-            onValueChange = { email.value = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password.value,
-            onValueChange = { password.value = it },
-            label = { Text("Kata Sandi") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = confirmPassword.value,
-            onValueChange = { confirmPassword.value = it },
-            label = { Text("Konfirmasi Kata Sandi") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                if (password.value == confirmPassword.value) {
-                    navController.navigate("dashboard") // Navigasi ke Dashboard setelah pendaftaran berhasil
-                } else {
-                    // Tampilkan error jika password tidak sesuai
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+        // Bagian putih dengan sudut membulat di bawah
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.80f) // Mengisi 85% dari tinggi layar
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                )
+                .align(Alignment.TopCenter)
         ) {
-            Text("Daftar", color = Color.White)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Sign Up",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // Input Name
+                TextField(
+                    value = name.value,
+                    onValueChange = { name.value = it },
+                    label = { Text("Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent), // Menghapus latar belakang
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent, // Latar belakang transparan
+                        focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
+                        unfocusedIndicatorColor = Color.LightGray // Warna garis saat tidak fokus
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Input Email
+                TextField(
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    label = { Text("Email") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.LightGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Input Password
+                TextField(
+                    value = password.value,
+                    onValueChange = { password.value = it },
+                    label = { Text("Password") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.LightGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Input Confirm Password
+                TextField(
+                    value = confirmPassword.value,
+                    onValueChange = { confirmPassword.value = it },
+                    label = { Text("Confirm Password") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.LightGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(120.dp))
+
+                // Tombol "Create Account"
+                Button(
+                    onClick = {
+                        if (password.value == confirmPassword.value) {
+                            navController.navigate("dashboard")
+                        } else {
+                            // Tampilkan pesan error
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp), // Tinggi tombol sesuai desain
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                ) {
+                    Text("Create Account", color = Color.White)
+                }
+            }
         }
     }
 }
+
+
+
 
 
 // Implementasi DashboardScreen
