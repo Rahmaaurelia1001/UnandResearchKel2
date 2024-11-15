@@ -9,10 +9,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -20,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tbptb.ui.theme.TBPTBTheme
-import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +35,7 @@ class MainActivity : ComponentActivity() {
             TBPTBTheme {
                 val navController = rememberNavController()
 
-                // Menetapkan layar awal ke "splash"
+                // Set splash screen sebagai layar awal
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
@@ -47,16 +50,16 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // Splash screen ditampilkan selama 2 detik
-        navController.navigate("main") { // Navigasi ke main setelah 2 detik
-            popUpTo("splash") { inclusive = true } // Menghapus splash dari back stack agar tidak bisa kembali ke splash
+        delay(2000) // Splash screen selama 2 detik
+        navController.navigate("main") {
+            popUpTo("splash") { inclusive = true }
         }
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF469C8F)), // Warna hijau latar belakang
+            .background(Color(0xFF469C8F)),
         contentAlignment = Alignment.Center
     ) {
         Image(painter = painterResource(id = R.drawable.logo_ur_app), contentDescription = "Logo")
@@ -64,60 +67,183 @@ fun SplashScreen(navController: NavController) {
 }
 
 @Composable
-fun MainContent(navController: NavController, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize() // Memastikan column mengisi seluruh layar
-            .padding(16.dp)
-            .background(Color(0xFF469C8F)), // Warna hijau untuk latar belakang
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+fun MainContent(navController: NavController) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF469C8F))
     ) {
-        // Gambar buku
-        Image(painter = painterResource(id = R.drawable.buku), contentDescription = "Book Image")
-
-        Spacer(modifier = Modifier.height(32.dp)) // Memberi jarak antara gambar dan tombol
-
-        // Tombol Login dengan warna putih dan teks hitam
-        Button(
-            onClick = { navController.navigate("login") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White) // Mengubah warna tombol jadi putih
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Login", color = Color.Black) // Mengubah warna teks tombol jadi hitam
-        }
+            // Gambar Buku
+            Image(
+                painter = painterResource(id = R.drawable.buku),
+                contentDescription = "Book Image",
+                modifier = Modifier.size(200.dp) // Menentukan ukuran gambar
+            )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Memberi jarak antara tombol dan teks
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Tombol SignUp
-        TextButton(onClick = { navController.navigate("signup") }) {
-            Text("Don't have an account? Sign Up", color = Color.White) // Mengubah warna teks menjadi putih
+            // Teks Deskriptif
+            Text(
+                text = "Organize your scientific research \nwith Unand Research APP!",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Register your progress with accuracy.\n" +
+                        "Track and share deadline, notes, and tasks with your \n" +
+                        "colleagues and advisors.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Button Login
+            Button(
+                onClick = { navController.navigate("login") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("Login", color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Button Sign Up
+            TextButton(onClick = { navController.navigate("signup") }) {
+                Text("Belum punya akun? Daftar", color = Color.White)
+            }
         }
     }
 }
 
+
+
 @Composable
 fun LoginScreen() {
-    // Konten tampilan Login
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Login Screen")
-        // Tambahkan formulir login di sini
+        Text("Halaman Login", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* Handle input */ },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = "",
+            onValueChange = { /* Handle input */ },
+            label = { Text("Kata Sandi") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* Tambahkan aksi login */ },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+        ) {
+            Text("Masuk", color = Color.White)
+        }
     }
 }
 
 @Composable
 fun SignUpScreen() {
-    // Konten tampilan Sign Up
+    val username = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") } // Tambahkan state untuk Confirm Password
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Sign Up Screen")
-        // Tambahkan formulir signup di sini
+        Text("Daftar Akun", style = MaterialTheme.typography.headlineMedium, color = Color(0xFF469C8F))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = username.value,
+            onValueChange = { username.value = it },
+            label = { Text("Nama Pengguna") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = email.value,
+            onValueChange = { email.value = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = password.value,
+            onValueChange = { password.value = it },
+            label = { Text("Kata Sandi") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Field Confirm Password
+        OutlinedTextField(
+            value = confirmPassword.value,
+            onValueChange = { confirmPassword.value = it },
+            label = { Text("Konfirmasi Kata Sandi") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                // Tambahkan validasi jika password dan confirmPassword harus sama
+                if (password.value == confirmPassword.value) {
+                    // Lakukan aksi daftar
+                } else {
+                    // Tampilkan error jika password tidak sesuai
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+        ) {
+            Text("Daftar", color = Color.White)
+        }
     }
 }
 
