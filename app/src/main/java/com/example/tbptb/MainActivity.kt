@@ -9,10 +9,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -20,10 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tbptb.ui.theme.TBPTBTheme
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,8 +39,9 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
-                    composable("login") { LoginScreen() }
-                    composable("signup") { SignUpScreen() }
+                    composable("login") { LoginScreen(navController) } // Tambahkan navController
+                    composable("signup") { SignUpScreen(navController) } // Tambahkan navController
+                    composable("dashboard") { DashboardScreen() } // Tidak perlu navController jika tidak ada navigasi lanjutan
                 }
             }
         }
@@ -68,35 +69,71 @@ fun SplashScreen(navController: NavController) {
 
 @Composable
 fun MainContent(navController: NavController) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFF469C8F)),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color(0xFF469C8F))
     ) {
-        Image(painter = painterResource(id = R.drawable.buku), contentDescription = "Book Image")
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = { navController.navigate("login") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Login", color = Color.Black)
-        }
+            // Gambar Buku
+            Image(
+                painter = painterResource(id = R.drawable.buku),
+                contentDescription = "Book Image",
+                modifier = Modifier.size(200.dp) // Menentukan ukuran gambar
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = { navController.navigate("signup") }) {
-            Text("Belum punya akun? Daftar", color = Color.White)
+            // Teks Deskriptif
+            Text(
+                text = "Organize your scientific research \nwith Unand Research APP!",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Register your progress with accuracy.\n" +
+                        "Track and share deadline, notes, and tasks with your \n" +
+                        "colleagues and advisors.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Button Login
+            Button(
+                onClick = { navController.navigate("login") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text("Login", color = Color.Black)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Button Sign Up
+            TextButton(onClick = { navController.navigate("signup") }) {
+                Text("Belum punya akun? Daftar", color = Color.White)
+            }
         }
     }
 }
 
+
+
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -128,7 +165,7 @@ fun LoginScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Tambahkan aksi login */ },
+            onClick = { navController.navigate("dashboard") }, // Aksi untuk menuju Dashboard
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
@@ -138,10 +175,11 @@ fun LoginScreen() {
 }
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(navController: NavController) { // Tambahkan navController sebagai parameter
     val username = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -180,15 +218,94 @@ fun SignUpScreen() {
             visualTransformation = PasswordVisualTransformation()
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = confirmPassword.value,
+            onValueChange = { confirmPassword.value = it },
+            label = { Text("Konfirmasi Kata Sandi") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Tambahkan fungsi daftar di sini */ },
+            onClick = {
+                if (password.value == confirmPassword.value) {
+                    navController.navigate("dashboard") // Navigasi ke Dashboard setelah pendaftaran berhasil
+                } else {
+                    // Tampilkan error jika password tidak sesuai
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
             Text("Daftar", color = Color.White)
         }
+    }
+}
+
+
+// Implementasi DashboardScreen
+@Composable
+fun DashboardScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = "Welcome to your Dashboard!",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(0xFF469C8F)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Contoh Card untuk informasi penting
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Your Recent Progress", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("You have completed 3 tasks today!")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Contoh menu item
+        Text(
+            text = "Tasks",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+        Text(
+            text = "Notes",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+        Text(
+            text = "Deadlines",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Black
+        )
+    }
+}
+
+// Preview untuk DashboardScreen
+@Preview(showBackground = true)
+@Composable
+fun DashboardScreenPreview() {
+    TBPTBTheme {
+        DashboardScreen()
     }
 }
 
