@@ -144,7 +144,6 @@ fun MainContent(navController: NavController) {
 }
 
 
-
 @Composable
 fun LoginScreen(navController: NavController) {
     val email = remember { mutableStateOf("") }
@@ -155,31 +154,41 @@ fun LoginScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color(0xFF469C8F)) // Warna hijau untuk latar belakang penuh
     ) {
-        // Bagian putih dengan sudut membulat di bawah
+        // Gambar di bagian atas
+        Image(
+            painter = painterResource(id = R.drawable.logo_ur_app),
+            contentDescription = "Logo",
+            modifier = Modifier
+                .size(120.dp)
+                .align(Alignment.TopCenter)
+                .padding(top = 32.dp)
+        )
+
+        // Bagian putih di bawah
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.80f) // Mengisi 80% dari tinggi layar
+                .fillMaxHeight(0.75f) // Isi 75% dari tinggi layar
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
-                .align(Alignment.TopCenter)
+                .align(Alignment.BottomCenter)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Tulisan Login
                 Text(
                     text = "Login",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
-
-                Spacer(modifier = Modifier.height(40.dp))
 
                 // Input Email
                 TextField(
@@ -214,18 +223,12 @@ fun LoginScreen(navController: NavController) {
                     )
                 )
 
-                Spacer(modifier = Modifier.height(120.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Tombol "Login"
+                // Tombol Login
                 Button(
                     onClick = {
-                        // Cek email dan password, jika valid navigasi ke dashboard
-                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            // Navigasi ke Dashboard jika login berhasil
-                            navController.navigate("dashboard")
-                        } else {
-                            // Logika jika login gagal
-                        }
+                        navController.navigate("dashboard") // Arahkan ke dashboard
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -237,14 +240,11 @@ fun LoginScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Tombol untuk navigasi ke Sign Up
+                // Tombol "Belum punya akun?"
                 TextButton(
-                    onClick = {
-                        navController.navigate("signUp") // Navigasi ke layar Sign Up
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    onClick = { navController.navigate("signup") } // Arahkan ke signup
                 ) {
-                    Text("Don't have an account? Sign Up", color = Color(0xFF469C8F))
+                    Text("Belum punya akun? Daftar", color = Color(0xFF469C8F))
                 }
             }
         }
