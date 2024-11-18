@@ -1,5 +1,6 @@
 package com.example.tbptb
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.Color
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +32,7 @@ fun CollaboratorScreen(navController: NavController) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF469C8F))
+                }
             )
         }
     ) { paddingValues ->
@@ -42,14 +43,13 @@ fun CollaboratorScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Heading for adding collaborator email
+            // Title
             Text(
                 text = "Add Collaborator Email",
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF4A4A4A)
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
             )
 
-            // Email input field with error handling
+            // Email Input Field
             OutlinedTextField(
                 value = emailInput.value,
                 onValueChange = { emailInput.value = it },
@@ -60,13 +60,11 @@ fun CollaboratorScreen(navController: NavController) {
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color(0xFF469C8F),
                     cursorColor = Color(0xFF469C8F),
-                    errorBorderColor = Color.Red,
-                    focusedLabelColor = Color(0xFF469C8F),
-                    unfocusedBorderColor = Color(0xFFBDBDBD)
+                    errorBorderColor = Color.Red
                 )
             )
 
-            // Display error message if email is invalid
+            // Error Message
             if (emailError) {
                 Text(
                     text = "Please enter a valid email",
@@ -75,7 +73,7 @@ fun CollaboratorScreen(navController: NavController) {
                 )
             }
 
-            // Add email button
+            // Add Collaborator Button
             Button(
                 onClick = {
                     val email = emailInput.value
@@ -95,21 +93,19 @@ fun CollaboratorScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Heading for displaying list of collaborators
+            // Collaborator List Title
             Text(
                 text = "Collaborator List",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = Color(0xFF4A4A4A)
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
 
-            // Displaying the list of emails
+            // Displaying the List of Collaborators (Emails)
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(emailList) { email ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+                            .padding(vertical = 4.dp)
                     ) {
                         Text(
                             text = email,
