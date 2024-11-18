@@ -30,7 +30,15 @@ import kotlinx.coroutines.delay
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.clickable
-
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.AccountCircle
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -153,7 +161,7 @@ fun LoginScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.80f) // Mengisi 80% dari tinggi layar
+                .fillMaxHeight() // Mengisi 80% dari tinggi layar
                 .background(
                     color = Color.White,
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Kotak putih berada di bawah dengan sudut atas membulat
@@ -216,7 +224,7 @@ fun LoginScreen(navController: NavController) {
                         // Validasi dan logika untuk login
                         if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
                             // Arahkan ke halaman dashboard setelah login berhasil
-                            navController.navigate("dashboard")
+                            navController.navigate("Dashboard")
                         } else {
                             // Tampilkan pesan error
                         }
@@ -356,7 +364,7 @@ fun SignUpScreen(navController: NavController) {
                 Button(
                     onClick = {
                         if (password.value == confirmPassword.value) {
-                            navController.navigate("dashboard")
+
                         } else {
                             // Tampilkan pesan error
                         }
@@ -373,71 +381,186 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
-
-
-
-
 // Implementasi DashboardScreen
 @Composable
 fun DashboardScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+            .background(Color(0xFFF7F8FA))
+            .padding(16.dp)
     ) {
-        Text(
-            text = "Welcome to your Dashboard!",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color(0xFF469C8F)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Contoh Card untuk informasi penting
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1))
+        // Header Section
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Your Recent Progress", style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("You have completed 3 tasks today!")
+            Column {
+                Text("Welcome Back!", style = MaterialTheme.typography.bodyMedium)
+                Text("Hallo, Rahma!", style = MaterialTheme.typography.headlineSmall)
+            }
+            IconButton(onClick = { /* Handle notification click */ }) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notification Icon"
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Contoh menu item
-        Text(
-            text = "Tasks",
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black
+        // Calendar Section
+        Text("Oktober 2024", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            DateButton("Fri", "11")
+            DateButton("Sat", "12")
+            DateButton("Sun", "13", isSelected = true)
+            DateButton("Mon", "14")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // New Project Button
+        Button(
+            onClick = { /* Handle new project click */ },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF71A6D2))
+        ) {
+            Text("New Project")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Current Project Section
+        Text("Current Project", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ProjectCard(
+                title = "Rancangan Aplikasi Umroh",
+                members = listOf("member1.jpg", "member2.jpg"),
+                progress = 51
+            )
+            ProjectCard(
+                title = "Sistem Informasi Absensi",
+                members = listOf("member1.jpg", "member2.jpg", "member3.jpg"),
+                progress = 51
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Your Project Section
+        Text("Your Project", style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        ProjectDetailsCard(
+            title = "Perancangan Aplikasi Umroh",
+            status = "On Progress",
+            objectName = "PT Cahaya Hati Cabang Padang",
+            collaborators = listOf("Radatul Mutmainnah", "Regina Nathamiya")
         )
-        Text(
-            text = "Notes",
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black
-        )
-        Text(
-            text = "Deadlines",
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black
-        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Bottom Navigation
+        NavigationBar {
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator") },
+                label = { Text("Collaborator") },
+                selected = false,
+                onClick = { /* Handle navigation */ }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Check, contentDescription = "Task") },
+                label = { Text("Task") },
+                selected = false,
+                onClick = { /* Handle navigation */ }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Folder, contentDescription = "Project") },
+                label = { Text("Project") },
+                selected = true,
+                onClick = { /* Handle navigation */ }
+            )
+        }
     }
 }
 
-// Preview untuk DashboardScreen
-@Preview(showBackground = true)
 @Composable
-fun DashboardScreenPreview() {
-    TBPTBTheme {
-        DashboardScreen()
+fun DateButton(day: String, date: String, isSelected: Boolean = false) {
+    Column(
+        modifier = Modifier
+            .background(
+                if (isSelected) Color(0xFFBFD4E5) else Color.White,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(day, style = MaterialTheme.typography.bodySmall)
+        Text(date, style = MaterialTheme.typography.titleMedium)
     }
 }
+
+@Composable
+fun ProjectCard(title: String, members: List<String>, progress: Int) {
+    Card(
+        modifier = Modifier
+            .width(150.dp)
+            .height(120.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+            Spacer(modifier = Modifier.height(8.dp))
+            Row {
+                members.forEach { member ->
+                    // Replace with Image composable
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Member",
+                        tint = Color.White
+                    )
+
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = progress / 100f,
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.White
+            )
+            Text("$progress% completed", style = MaterialTheme.typography.bodySmall, color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun ProjectDetailsCard(
+    title: String,
+    status: String,
+    objectName: String,
+    collaborators: List<String>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+            Text("Status: $status", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Objek: $objectName", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text("Collaborator: ${collaborators.joinToString()}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
