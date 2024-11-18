@@ -54,7 +54,8 @@ class MainActivity : ComponentActivity() {
                     composable("main") { MainContent(navController) }
                     composable("login") { LoginScreen(navController) } // Tambahkan navController
                     composable("signup") { SignUpScreen(navController) } // Tambahkan navController
-                    composable("dashboard") { DashboardScreen() } // Tidak perlu navController jika tidak ada navigasi lanjutan
+                    composable("dashboard") { DashboardScreen(navController) } // Menambahkan navController
+                    composable("collaborator") { CollaboratorScreen(navController) } // Rute untuk CollaboratorScreen
                 }
             }
         }
@@ -381,9 +382,8 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
-// Implementasi DashboardScreen
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -474,7 +474,7 @@ fun DashboardScreen() {
                 icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator") },
                 label = { Text("Collaborator") },
                 selected = false,
-                onClick = { /* Handle navigation */ }
+                onClick = { navController.navigate("collaborator") } // Navigate to CollaboratorScreen
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Check, contentDescription = "Task") },
