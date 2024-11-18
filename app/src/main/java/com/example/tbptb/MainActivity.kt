@@ -29,6 +29,8 @@ import com.example.tbptb.ui.theme.TBPTBTheme
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.clickable
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -139,45 +141,108 @@ fun MainContent(navController: NavController) {
 
 @Composable
 fun LoginScreen(navController: NavController) {
-    Column(
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color(0xFF469C8F)) // Warna hijau untuk latar belakang penuh
     ) {
-        Text("Halaman Login", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* Handle input */ },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = "",
-            onValueChange = { /* Handle input */ },
-            label = { Text("Kata Sandi") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("dashboard") }, // Aksi untuk menuju Dashboard
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+        // Bagian putih dengan sudut membulat di bawah
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.80f) // Mengisi 80% dari tinggi layar
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Kotak putih berada di bawah dengan sudut atas membulat
+                )
+                .align(Alignment.BottomCenter) // Letakkan Box di bagian bawah layar
         ) {
-            Text("Masuk", color = Color.White)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Login",
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                // Input Email
+                TextField(
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    label = { Text("Email") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent), // Menghapus latar belakang
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent, // Latar belakang transparan
+                        focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
+                        unfocusedIndicatorColor = Color.LightGray // Warna garis saat tidak fokus
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Input Password
+                TextField(
+                    value = password.value,
+                    onValueChange = { password.value = it },
+                    label = { Text("Password") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.LightGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(120.dp))
+
+                // Tombol "Login"
+                Button(
+                    onClick = {
+                        // Validasi dan logika untuk login
+                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            // Arahkan ke halaman dashboard setelah login berhasil
+                            navController.navigate("dashboard")
+                        } else {
+                            // Tampilkan pesan error
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp), // Tinggi tombol sesuai desain
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                ) {
+                    Text("Login", color = Color.White)
+                }
+
+                // Jika perlu, tambahkan tautan ke layar signup
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Don't have an account? Sign up",
+                    modifier = Modifier.clickable {
+                        navController.navigate("signup")
+                    },
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun SignUpScreen(navController: NavController) {
