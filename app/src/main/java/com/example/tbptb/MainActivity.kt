@@ -5,7 +5,6 @@ package com.example.tbptb
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -45,7 +44,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             TBPTBTheme {
                 val navController = rememberNavController()
@@ -161,12 +159,12 @@ fun LoginScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight() // Mengisi 80% dari tinggi layar
+                .fillMaxHeight(0.80f) // Mengisi 80% dari tinggi layar
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Kotak putih berada di bawah dengan sudut atas membulat
+                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                 )
-                .align(Alignment.BottomCenter) // Letakkan Box di bagian bawah layar
+                .align(Alignment.TopCenter)
         ) {
             Column(
                 modifier = Modifier
@@ -190,11 +188,11 @@ fun LoginScreen(navController: NavController) {
                     label = { Text("Email") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Transparent), // Menghapus latar belakang
+                        .background(Color.Transparent),
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent, // Latar belakang transparan
-                        focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
-                        unfocusedIndicatorColor = Color.LightGray // Warna garis saat tidak fokus
+                        containerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Gray,
+                        unfocusedIndicatorColor = Color.LightGray
                     )
                 )
 
@@ -221,12 +219,12 @@ fun LoginScreen(navController: NavController) {
                 // Tombol "Login"
                 Button(
                     onClick = {
-                        // Validasi dan logika untuk login
+                        // Cek email dan password, jika valid navigasi ke dashboard
                         if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            // Arahkan ke halaman dashboard setelah login berhasil
-                            navController.navigate("Dashboard")
+                            // Navigasi ke Dashboard jika login berhasil
+                            navController.navigate("dashboard")
                         } else {
-                            // Tampilkan pesan error
+                            // Logika jika login gagal
                         }
                     },
                     modifier = Modifier
@@ -237,15 +235,17 @@ fun LoginScreen(navController: NavController) {
                     Text("Login", color = Color.White)
                 }
 
-                // Jika perlu, tambahkan tautan ke layar signup
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Don't have an account? Sign up",
-                    modifier = Modifier.clickable {
-                        navController.navigate("signup")
+
+                // Tombol untuk navigasi ke Sign Up
+                TextButton(
+                    onClick = {
+                        navController.navigate("signUp") // Navigasi ke layar Sign Up
                     },
-                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                )
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                ) {
+                    Text("Don't have an account? Sign Up", color = Color(0xFF469C8F))
+                }
             }
         }
     }
