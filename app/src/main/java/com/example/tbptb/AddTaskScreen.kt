@@ -20,14 +20,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.unit.Dp
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(navController: NavController) {
     var taskName by remember { mutableStateOf("") }
     var taskDescription by remember { mutableStateOf("") }
     var taskDeadlineDate by remember { mutableStateOf<Date?>(null) }
-    var taskDeadlineTime by remember { mutableStateOf<String>("00:00") }
+    var taskDeadlineTime by remember { mutableStateOf("00:00") }
     var taskAssignee by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -130,7 +129,7 @@ fun AddTaskScreen(navController: NavController) {
                 // Tombol Save Task
                 Button(
                     onClick = {
-                        // Logika untuk menyimpan tugas
+                        // Logika untuk menyimpan tugas, misalnya mengirim data ke API
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,7 +176,7 @@ fun AddTaskScreen(navController: NavController) {
     }
 }
 
-// Fungsi untuk membuat input form dengan background hijau muda
+// Fungsi untuk membuat input form
 @Composable
 fun TaskInputField(
     label: String,
@@ -190,11 +189,11 @@ fun TaskInputField(
         modifier = Modifier
             .fillMaxWidth()
             .height(height)
-            .background(Color(0xFFE0F7FA), RoundedCornerShape(8.dp))
+            .background(Color(0xFFE0F2F1)) // Background biru muda untuk tiap field
             .padding(16.dp)
     ) {
         if (isClickable) {
-            // Jika input bisa diklik (seperti untuk tanggal), buat field bisa di-click
+            // Jika input bisa diklik (seperti untuk tanggal), tampilkan nilai dengan teks
             Text(text = value, color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
         } else {
             BasicTextField(
