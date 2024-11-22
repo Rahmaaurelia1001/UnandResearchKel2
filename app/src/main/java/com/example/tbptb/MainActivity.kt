@@ -56,6 +56,8 @@ class MainActivity : ComponentActivity() {
                     composable("signup") { SignUpScreen(navController) } // Tambahkan navController
                     composable("dashboard") { DashboardScreen(navController) } // Menambahkan navController
                     composable("collaborator") { CollaboratorScreen(navController) } // Rute untuk CollaboratorScreen
+                    composable("add_task") { AddTaskScreen(navController) }
+
                 }
             }
         }
@@ -480,7 +482,7 @@ fun DashboardScreen(navController: NavController) {
                 icon = { Icon(Icons.Default.Check, contentDescription = "Task") },
                 label = { Text("Task") },
                 selected = false,
-                onClick = { /* Handle navigation */ }
+                onClick = { navController.navigate("add_task") }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Folder, contentDescription = "Project") },
