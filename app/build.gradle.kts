@@ -68,6 +68,9 @@ dependencies {
     // Material 3
     implementation("androidx.compose.material3:material3:1.2.0")
 
+    // Material 2 (Optional for extended icons and components)
+    implementation("androidx.compose.material:material:1.5.1") // Optional untuk komponen Material 2
+
     // Navigation for Compose
     implementation("androidx.navigation:navigation-compose:2.7.3")
 
@@ -76,6 +79,9 @@ dependencies {
 
     // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Foundation for BasicTextField and other layout components
+    implementation("androidx.compose.foundation:foundation:1.5.1")  // Menambahkan foundation untuk komponen seperti BasicTextField
 
     // Testing libraries
     testImplementation("junit:junit:4.13.2")

@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.ui.draw.clip
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,9 +55,10 @@ class MainActivity : ComponentActivity() {
                     composable("main") { MainContent(navController) }
                     composable("login") { LoginScreen(navController) } // Tambahkan navController
                     composable("signup") { SignUpScreen(navController) } // Tambahkan navController
-                    composable("dashboard") { DashboardScreen(navController) } // Menambahkan navController
-                    composable("collaborator") { CollaboratorScreen(navController) } // Rute untuk CollaboratorScreen
+                    composable("dashboard") { DashboardScreen(navController) } // Tidak perlu navController jika tidak ada navigasi lanjutan
                     composable("add_task") { AddTaskScreen(navController) }
+                    composable("Collaborator") { CollaboratorScreen(navController) }
+                    composable("Buat_Project") { ProjectCreationScreen(navController) }
 
                 }
             }
@@ -147,6 +149,7 @@ fun MainContent(navController: NavController) {
 }
 
 
+
 @Composable
 fun LoginScreen(navController: NavController) {
     val email = remember { mutableStateOf("") }
@@ -157,41 +160,31 @@ fun LoginScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color(0xFF469C8F)) // Warna hijau untuk latar belakang penuh
     ) {
-        // Gambar di bagian atas
-        Image(
-            painter = painterResource(id = R.drawable.logo_ur_app),
-            contentDescription = "Logo",
-            modifier = Modifier
-                .size(120.dp)
-                .align(Alignment.TopCenter)
-                .padding(top = 32.dp)
-        )
-
-        // Bagian putih di bawah
+        // Bagian putih dengan sudut membulat di bawah
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.75f) // Isi 75% dari tinggi layar
+                .fillMaxHeight() // Mengisi 80% dari tinggi layar
                 .background(
                     color = Color.White,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Kotak putih berada di bawah dengan sudut atas membulat
                 )
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomCenter) // Letakkan Box di bagian bawah layar
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
-                // Tulisan Login
                 Text(
                     text = "Login",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(40.dp))
 
                 // Input Email
                 TextField(
@@ -200,11 +193,11 @@ fun LoginScreen(navController: NavController) {
                     label = { Text("Email") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Transparent),
+                        .background(Color.Transparent), // Menghapus latar belakang
                     colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Gray,
-                        unfocusedIndicatorColor = Color.LightGray
+                        containerColor = Color.Transparent, // Latar belakang transparan
+                        focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
+                        unfocusedIndicatorColor = Color.LightGray // Warna garis saat tidak fokus
                     )
                 )
 
@@ -226,12 +219,18 @@ fun LoginScreen(navController: NavController) {
                     )
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(120.dp))
 
-                // Tombol Login
+                // Tombol "Login"
                 Button(
                     onClick = {
-                        navController.navigate("dashboard") // Arahkan ke dashboard
+                        // Validasi dan logika untuk login
+                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            // Arahkan ke halaman dashboard setelah login berhasil
+                            navController.navigate("Dashboard")
+                        } else {
+                            // Tampilkan pesan error
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -241,14 +240,15 @@ fun LoginScreen(navController: NavController) {
                     Text("Login", color = Color.White)
                 }
 
+                // Jika perlu, tambahkan tautan ke layar signup
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Tombol "Belum punya akun?"
-                TextButton(
-                    onClick = { navController.navigate("signup") } // Arahkan ke signup
-                ) {
-                    Text("Belum punya akun? Daftar", color = Color(0xFF469C8F))
-                }
+                Text(
+                    text = "Don't have an account? Sign up",
+                    modifier = Modifier.clickable {
+                        navController.navigate("signup")
+                    },
+                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                )
             }
         }
     }
@@ -384,6 +384,7 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
+// Implementasi
 @Composable
 fun DashboardScreen(navController: NavController) {
     Column(
@@ -398,10 +399,32 @@ fun DashboardScreen(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text("Welcome Back!", style = MaterialTheme.typography.bodyMedium)
-                Text("Hallo, Rahma!", style = MaterialTheme.typography.headlineSmall)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Circle for Profile
+                Box(
+                    modifier = Modifier
+                        .size(48.dp) // Ukuran lingkaran
+                        .clip(shape = RoundedCornerShape(50)) // Membuat bentuk lingkaran
+                        .background(Color.Gray), // Warna latar lingkaran (bisa diganti dengan gambar profil)
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Placeholder untuk gambar profil (bisa diganti dengan Image jika ada)
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Profile Icon",
+                        tint = Color.White,
+                        modifier = Modifier.size(36.dp) // Ukuran ikon dalam lingkaran
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp)) // Jarak antara lingkaran dan teks
+
+                Column {
+                    Text("Welcome Back!", style = MaterialTheme.typography.bodyMedium)
+                    Text("Hallo, Rahma!", style = MaterialTheme.typography.headlineSmall)
+                }
             }
+
             IconButton(onClick = { /* Handle notification click */ }) {
                 Icon(
                     imageVector = Icons.Default.Notifications,
@@ -431,7 +454,7 @@ fun DashboardScreen(navController: NavController) {
         Button(
             onClick = { /* Handle new project click */ },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF71A6D2))
         ) {
             Text("New Project")
         }
@@ -468,7 +491,7 @@ fun DashboardScreen(navController: NavController) {
             collaborators = listOf("Radatul Mutmainnah", "Regina Nathamiya")
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(60.dp))
 
         // Bottom Navigation
         NavigationBar {
@@ -476,7 +499,7 @@ fun DashboardScreen(navController: NavController) {
                 icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator") },
                 label = { Text("Collaborator") },
                 selected = false,
-                onClick = { navController.navigate("collaborator") } // Navigate to CollaboratorScreen
+                onClick = { navController.navigate("Collaborator") }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.Check, contentDescription = "Task") },
@@ -488,18 +511,19 @@ fun DashboardScreen(navController: NavController) {
                 icon = { Icon(Icons.Default.Folder, contentDescription = "Project") },
                 label = { Text("Project") },
                 selected = true,
-                onClick = { /* Handle navigation */ }
+                onClick = { navController.navigate("Buat_Project") }
             )
         }
     }
 }
+
 
 @Composable
 fun DateButton(day: String, date: String, isSelected: Boolean = false) {
     Column(
         modifier = Modifier
             .background(
-                if (isSelected) Color(0xFF469C8F) else Color.White,
+                if (isSelected) Color(0xFFBFD4E5) else Color.White,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
@@ -516,7 +540,7 @@ fun ProjectCard(title: String, members: List<String>, progress: Int) {
         modifier = Modifier
             .width(150.dp)
             .height(120.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
@@ -552,7 +576,7 @@ fun ProjectDetailsCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
