@@ -471,7 +471,7 @@ fun DashboardScreen(navController: NavController) {
         Button(
             onClick = { /* Handle new project click */ },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF71A6D2))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
             Text("New Project")
         }
@@ -539,7 +539,7 @@ fun DateButton(day: String, date: String, isSelected: Boolean = false) {
     Column(
         modifier = Modifier
             .background(
-                if (isSelected) Color(0xFFBFD4E5) else Color.White,
+                if (isSelected) Color(0xFF469C8F) else Color.White,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
@@ -556,7 +556,7 @@ fun ProjectCard(title: String, members: List<String>, progress: Int) {
         modifier = Modifier
             .width(150.dp)
             .height(120.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
@@ -592,7 +592,7 @@ fun ProjectDetailsCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
