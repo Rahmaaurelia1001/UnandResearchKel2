@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -148,7 +147,6 @@ fun MainContent(navController: NavController) {
         }
     }
 }
-
 
 
 @Composable
@@ -399,7 +397,7 @@ fun SignUpScreen(navController: NavController) {
         }
     }
 }
-
+// Implementasi
 @Composable
 fun DashboardScreen(navController: NavController) {
     Column(
@@ -415,22 +413,24 @@ fun DashboardScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                // Circle for Profile
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(Color.Gray),
+                        .size(48.dp) // Ukuran lingkaran
+                        .clip(shape = RoundedCornerShape(50)) // Membuat bentuk lingkaran
+                        .background(Color.Gray), // Warna latar lingkaran (bisa diganti dengan gambar profil)
                     contentAlignment = Alignment.Center
                 ) {
+                    // Placeholder untuk gambar profil (bisa diganti dengan Image jika ada)
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = "Profile Icon",
                         tint = Color.White,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp) // Ukuran ikon dalam lingkaran
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp)) // Jarak antara lingkaran dan teks
 
                 Column {
                     Text("Welcome Back!", style = MaterialTheme.typography.bodyMedium)
@@ -452,9 +452,7 @@ fun DashboardScreen(navController: NavController) {
         Text("Oktober 2024", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             DateButton("Fri", "11")
@@ -465,16 +463,18 @@ fun DashboardScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // New Project Button
         Button(
             onClick = { /* Handle new project click */ },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF71A6D2))
         ) {
             Text("New Project")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Current Project Section
         Text("Current Project", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -494,6 +494,7 @@ fun DashboardScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Your Project Section
         Text("Your Project", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         ProjectDetailsCard(
@@ -503,43 +504,28 @@ fun DashboardScreen(navController: NavController) {
             collaborators = listOf("Radatul Mutmainnah", "Regina Nathamiya")
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(60.dp))
 
-        // Bottom Navigation with Custom Background
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(15.dp)) // Radius 15
-                .background(Color.White) // Background putih
-                .border(
-                    width = 2.dp,
-                    color = Color(0xFF469C8F), // Stroke hijau
-                    shape = RoundedCornerShape(15.dp)
-                )
-        ) {
-            NavigationBar(
-                containerColor = Color.Transparent, // Hindari warna latar default
-                tonalElevation = 0.dp // Hindari efek elevasi default
-            ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator", tint = Color(0xFF469C8F)) },
-                    label = { Text("Collaborator", color = Color(0xFF469C8F)) },
-                    selected = false,
-                    onClick = { navController.navigate("Collaborator") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Check, contentDescription = "Task", tint = Color(0xFF469C8F)) },
-                    label = { Text("Task", color = Color(0xFF469C8F)) },
-                    selected = false,
-                    onClick = { navController.navigate("add_task") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Folder, contentDescription = "Project", tint = Color(0xFF469C8F)) },
-                    label = { Text("Project", color = Color(0xFF469C8F)) },
-                    selected = true,
-                    onClick = { navController.navigate("Buat_Project") }
-                )
-            }
+        // Bottom Navigation
+        NavigationBar {
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator") },
+                label = { Text("Collaborator") },
+                selected = false,
+                onClick = { navController.navigate("Collaborator") }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Check, contentDescription = "Task") },
+                label = { Text("Task") },
+                selected = false,
+                onClick = { navController.navigate("add_task") }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Folder, contentDescription = "Project") },
+                label = { Text("Project") },
+                selected = true,
+                onClick = { navController.navigate("Buat_Project") }
+            )
         }
     }
 }
@@ -550,7 +536,7 @@ fun DateButton(day: String, date: String, isSelected: Boolean = false) {
     Column(
         modifier = Modifier
             .background(
-                if (isSelected) Color(0xFF469C8F) else Color.White,
+                if (isSelected) Color(0xFFBFD4E5) else Color.White,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
@@ -567,7 +553,7 @@ fun ProjectCard(title: String, members: List<String>, progress: Int) {
         modifier = Modifier
             .width(150.dp)
             .height(120.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
@@ -603,7 +589,7 @@ fun ProjectDetailsCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF469C8F))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF71A6D2))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
@@ -613,6 +599,7 @@ fun ProjectDetailsCard(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
