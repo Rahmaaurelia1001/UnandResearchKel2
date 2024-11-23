@@ -158,97 +158,112 @@ fun LoginScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF469C8F)) // Warna hijau untuk latar belakang penuh
+            .background(Color(0xFF469C8F)) // Warna hijau sebagai latar belakang penuh
     ) {
-        // Bagian putih dengan sudut membulat di bawah
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight() // Mengisi 80% dari tinggi layar
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Kotak putih berada di bawah dengan sudut atas membulat
-                )
-                .align(Alignment.BottomCenter) // Letakkan Box di bagian bawah layar
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            // Logo aplikasi
+            Spacer(modifier = Modifier.height(40.dp)) // Jarak dari atas layar
+            Image(
+                painter = painterResource(id = R.drawable.logo_ur_app), // Ganti dengan logo Anda
+                contentDescription = "Logo Unand Research",
+                modifier = Modifier
+                    .size(100.dp) // Ukuran logo
+            )
+
+            Spacer(modifier = Modifier.height(16.dp)) // Jarak antara logo dan tulisan Login
+
+            // Bagian putih dengan sudut membulat
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Sudut atas membulat
+                    )
             ) {
-                Text(
-                    text = "Login",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black
-                )
-
-                Spacer(modifier = Modifier.height(40.dp))
-
-                // Input Email
-                TextField(
-                    value = email.value,
-                    onValueChange = { email.value = it },
-                    label = { Text("Email") },
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent), // Menghapus latar belakang
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent, // Latar belakang transparan
-                        focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
-                        unfocusedIndicatorColor = Color.LightGray // Warna garis saat tidak fokus
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Input Password
-                TextField(
-                    value = password.value,
-                    onValueChange = { password.value = it },
-                    label = { Text("Password") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent),
-                    visualTransformation = PasswordVisualTransformation(),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Gray,
-                        unfocusedIndicatorColor = Color.LightGray
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(120.dp))
-
-                // Tombol "Login"
-                Button(
-                    onClick = {
-                        // Validasi dan logika untuk login
-                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            // Arahkan ke halaman dashboard setelah login berhasil
-                            navController.navigate("Dashboard")
-                        } else {
-                            // Tampilkan pesan error
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp), // Tinggi tombol sesuai desain
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Top, // Konten mulai dari atas
+                    horizontalAlignment = Alignment.CenterHorizontally // Konten di tengah secara horizontal
                 ) {
-                    Text("Login", color = Color.White)
-                }
+                    // Tulisan Login di tengah
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
 
-                // Jika perlu, tambahkan tautan ke layar signup
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Don't have an account? Sign up",
-                    modifier = Modifier.clickable {
-                        navController.navigate("signup")
-                    },
-                    style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-                )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Input Email
+                    TextField(
+                        value = email.value,
+                        onValueChange = { email.value = it },
+                        label = { Text("Email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent), // Menghapus latar belakang TextField
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.LightGray
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Input Password
+                    TextField(
+                        value = password.value,
+                        onValueChange = { password.value = it },
+                        label = { Text("Password") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent),
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            containerColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Gray,
+                            unfocusedIndicatorColor = Color.LightGray
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Tombol "Login"
+                    Button(
+                        onClick = {
+                            if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                                navController.navigate("Dashboard")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp), // Tinggi tombol
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                    ) {
+                        Text("Login", color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Tautan ke halaman Signup
+                    Text(
+                        text = "Don't have an account? Sign up",
+                        modifier = Modifier.clickable {
+                            navController.navigate("signup")
+                        },
+                        style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+                    )
+                }
             }
         }
     }
@@ -384,7 +399,7 @@ fun SignUpScreen(navController: NavController) {
     }
 }
 
-// Implementasi
+
 @Composable
 fun DashboardScreen(navController: NavController) {
     Column(
@@ -439,7 +454,9 @@ fun DashboardScreen(navController: NavController) {
         Text("Oktober 2024", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             DateButton("Fri", "11")
@@ -517,7 +534,6 @@ fun DashboardScreen(navController: NavController) {
     }
 }
 
-
 @Composable
 fun DateButton(day: String, date: String, isSelected: Boolean = false) {
     Column(
@@ -586,7 +602,6 @@ fun ProjectDetailsCard(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
