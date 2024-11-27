@@ -57,7 +57,12 @@ fun ProjectCreationScreen(navController: NavController, addProject: (Project) ->
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-
+        Button(
+            onClick = { navController.navigate("ProposalForm") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Upload Proposal")
+        }
         Button(
             onClick = {
                 // Menambahkan proyek baru dan kembali ke layar sebelumnya
