@@ -60,6 +60,7 @@ class MainActivity : ComponentActivity() {
                     composable("signup") { SignUpScreen(navController) }
                     composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
+                    composable("ProposalForm") { ProposalForm(navController) }
                     composable("Collaborator") { CollaboratorScreen(navController) }
                     composable("profile") { ProfileScreen(navController) }
                     composable("update_profile") { UpdateProfile() }

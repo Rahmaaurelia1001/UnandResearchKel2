@@ -3,10 +3,12 @@ package com.example.tbptb
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -58,7 +60,11 @@ fun ProjectCreationScreen(navController: NavController, addProject: (Project) ->
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-
+        Button(
+            onClick = { navController.navigate("ProposalForm") },
+        ) {
+            Text("Upload Proposal", color = Color.Black)
+        }
         Button(
             onClick = {
                 // Menambahkan proyek baru dan kembali ke layar sebelumnya
@@ -71,5 +77,6 @@ fun ProjectCreationScreen(navController: NavController, addProject: (Project) ->
         ) {
             Text("Buat Project")
         }
+
     }
 }
