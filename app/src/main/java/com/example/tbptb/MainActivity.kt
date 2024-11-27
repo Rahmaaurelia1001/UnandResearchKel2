@@ -64,7 +64,6 @@ class MainActivity : ComponentActivity() {
                     composable("Collaborator") { CollaboratorScreen(navController) }
                     composable("profile") { ProfileScreen(navController) }
                     composable("update_profile") { UpdateProfile() }
-                    composable("ProposalForm") { ProposalForm(navController) }
                     composable("ProjectScreen") {
                         ProjectScreen(
                             navController = navController,

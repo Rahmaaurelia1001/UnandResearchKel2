@@ -15,10 +15,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 data class Project(
-    val name: String,
-    val description: String,
+    var name: String,
+    var description: String,
     val collaborator: String
 )
+
 @Composable
 fun ProjectCreationScreen(navController: NavController, addProject: (Project) -> Unit) {
     var name by remember { mutableStateOf("") }
@@ -57,12 +58,7 @@ fun ProjectCreationScreen(navController: NavController, addProject: (Project) ->
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = { navController.navigate("ProposalForm") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Upload Proposal")
-        }
+
         Button(
             onClick = {
                 // Menambahkan proyek baru dan kembali ke layar sebelumnya
