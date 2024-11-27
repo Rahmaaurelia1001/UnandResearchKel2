@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.border
 import androidx.compose.runtime.mutableStateListOf
+import com.example.tbptb.ui.theme.UpdateProfile
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +51,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             TBPTBTheme {
                 val navController = rememberNavController()
-                val projects = remember { mutableStateListOf<Project>() }
+                val projects = remember { mutableStateListOf<Project>()}
+
+
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
@@ -59,6 +62,8 @@ class MainActivity : ComponentActivity() {
                     composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
                     composable("Collaborator") { CollaboratorScreen(navController) }
+                    composable("profile") { ProfileScreen(navController) }
+                    composable("update_profile") { UpdateProfile() }
                     composable("ProjectScreen") {
                         ProjectScreen(
                             navController = navController,
@@ -72,8 +77,7 @@ class MainActivity : ComponentActivity() {
                                 projects.add(newProject) // Menambahkan proyek baru ke daftar
                             }
                         )
-                    }
-                    composable("profile") { ProfileScreen(navController) }
+                       }
                 }
             }
         }

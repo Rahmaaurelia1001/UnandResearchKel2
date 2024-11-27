@@ -104,16 +104,23 @@ fun ProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Tombol Update
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+        // Tombol Update Profile untuk pindah ke UpdateProfileScreen
         Button(
-            onClick = { /* Simpan perubahan profil */ },
+            onClick = { navController.navigate("update_profile") }, // Navigasi ke UpdateProfileScreen
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
-            Text("Update Profile")
+            Text(
+                "Update Profile",
+                color = Color.White
+                )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Tombol Ubah Password
         Button(
@@ -121,7 +128,8 @@ fun ProfileScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
-            Text("Ubah Password")
+            Text("Ubah Password",
+                    color = Color.White)
         }
 
         if (showChangePasswordDialog) {
@@ -140,13 +148,18 @@ fun ProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Tombol Back ke Dashboard
         Button(
             onClick = { navController.navigate("dashboard") },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
         ) {
-            Text("Back to Dashboard")
+            Text("Back to Dashboard",
+                color = Color.White)
         }
     }
 }
