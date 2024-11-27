@@ -40,7 +40,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.border
-
+import androidx.compose.runtime.mutableStateListOf
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,8 +50,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TBPTBTheme {
                 val navController = rememberNavController()
-
-
+                val projects = remember { mutableStateListOf<Project>() }
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
@@ -60,9 +59,21 @@ class MainActivity : ComponentActivity() {
                     composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
                     composable("Collaborator") { CollaboratorScreen(navController) }
-                    composable("Buat_Project") { ProjectCreationScreen(navController) }
+                    composable("ProjectScreen") {
+                        ProjectScreen(
+                            navController = navController,
+                            projects = projects // Meneruskan daftar proyek ke ProjectScreen
+                        )
+                    }
+                    composable("Buat_Project") {
+                        ProjectCreationScreen(
+                            navController = navController,
+                            addProject = { newProject ->
+                                projects.add(newProject) // Menambahkan proyek baru ke daftar
+                            }
+                        )
+                    }
                     composable("profile") { ProfileScreen(navController) }
-                    composable("project") { ProjectScreen(navController) }
                 }
             }
         }
@@ -539,7 +550,7 @@ fun DashboardScreen(navController: NavController) {
                     icon = { Icon(Icons.Default.Folder, contentDescription = "Project", tint = Color(0xFF469C8F)) },
                     label = { Text("Project", color = Color(0xFF469C8F)) },
                     selected = true,
-                    onClick = { navController.navigate("Project") }
+                    onClick = { navController.navigate("ProjectScreen") }
                 )
             }
         }
