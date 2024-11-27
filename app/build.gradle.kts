@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.core.ktx.v1120)
     implementation(libs.androidx.lifecycle.runtime.ktx.v262)
     implementation(libs.androidx.activity.compose.v172)
+    implementation ("io.coil-kt:coil-compose:2.4.0")
 
     // Jetpack Compose BOM for version consistency
     implementation(libs.androidx.compose.bom.v20241000)

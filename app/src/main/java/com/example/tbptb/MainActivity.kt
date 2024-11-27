@@ -51,17 +51,17 @@ class MainActivity : ComponentActivity() {
             TBPTBTheme {
                 val navController = rememberNavController()
 
-                // Set splash screen sebagai layar awal
+
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
-                    composable("login") { LoginScreen(navController) } // Tambahkan navController
-                    composable("signup") { SignUpScreen(navController) } // Tambahkan navController
-                    composable("dashboard") { DashboardScreen(navController) } // Tidak perlu navController jika tidak ada navigasi lanjutan
+                    composable("login") { LoginScreen(navController) }
+                    composable("signup") { SignUpScreen(navController) }
+                    composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
                     composable("Collaborator") { CollaboratorScreen(navController) }
                     composable("Buat_Project") { ProjectCreationScreen(navController) }
-
+                    composable("profile") { ProfileScreen(navController) }
                 }
             }
         }
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
-        delay(2000) // Splash screen selama 2 detik
+        delay(2000)
         navController.navigate("main") {
             popUpTo("splash") { inclusive = true }
         }
@@ -101,16 +101,16 @@ fun MainContent(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Gambar Buku
+
             Image(
                 painter = painterResource(id = R.drawable.buku),
                 contentDescription = "Book Image",
-                modifier = Modifier.size(200.dp) // Menentukan ukuran gambar
+                modifier = Modifier.size(200.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Teks Deskriptif
+
             Text(
                 text = "Organize your scientific research \nwith Unand Research APP!",
                 style = MaterialTheme.typography.titleMedium,
@@ -131,7 +131,7 @@ fun MainContent(navController: NavController) {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Button Login
+
             Button(
                 onClick = { navController.navigate("login") },
                 modifier = Modifier.fillMaxWidth(),
@@ -159,7 +159,7 @@ fun LoginScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF469C8F)) // Warna hijau sebagai latar belakang penuh
+            .background(Color(0xFF469C8F)) // Warna hijau untuk bg
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -167,33 +167,33 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Logo aplikasi
-            Spacer(modifier = Modifier.height(40.dp)) // Jarak dari atas layar
+            Spacer(modifier = Modifier.height(40.dp))
             Image(
-                painter = painterResource(id = R.drawable.logo_ur_app), // Ganti dengan logo Anda
+                painter = painterResource(id = R.drawable.logo_ur_app),
                 contentDescription = "Logo Unand Research",
                 modifier = Modifier
-                    .size(100.dp) // Ukuran logo
+                    .size(100.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp)) // Jarak antara logo dan tulisan Login
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Bagian putih dengan sudut membulat
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         color = Color.White,
-                        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp) // Sudut atas membulat
+                        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                     )
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.Top, // Konten mulai dari atas
-                    horizontalAlignment = Alignment.CenterHorizontally // Konten di tengah secara horizontal
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Tulisan Login di tengah
+
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = "Login",
@@ -211,7 +211,7 @@ fun LoginScreen(navController: NavController) {
                         label = { Text("Email") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.Transparent), // Menghapus latar belakang TextField
+                            .background(Color.Transparent),
                         colors = TextFieldDefaults.textFieldColors(
                             containerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Gray,
@@ -418,7 +418,8 @@ fun DashboardScreen(navController: NavController) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(Color.Gray),
+                        .background(Color.Gray)
+                        .clickable { navController.navigate("profile") }, // Navigasi ke halaman profil
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
