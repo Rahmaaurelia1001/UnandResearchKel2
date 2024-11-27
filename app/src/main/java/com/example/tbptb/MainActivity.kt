@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                     composable("Collaborator") { CollaboratorScreen(navController) }
                     composable("Buat_Project") { ProjectCreationScreen(navController) }
                     composable("profile") { ProfileScreen(navController) }
+                    composable("project") { ProjectScreen(navController) }
                 }
             }
         }
@@ -466,7 +467,7 @@ fun DashboardScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Handle new project click */ },
+            onClick = { navController.navigate("Buat_Project")},
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
@@ -538,7 +539,7 @@ fun DashboardScreen(navController: NavController) {
                     icon = { Icon(Icons.Default.Folder, contentDescription = "Project", tint = Color(0xFF469C8F)) },
                     label = { Text("Project", color = Color(0xFF469C8F)) },
                     selected = true,
-                    onClick = { navController.navigate("Buat_Project") }
+                    onClick = { navController.navigate("Project") }
                 )
             }
         }

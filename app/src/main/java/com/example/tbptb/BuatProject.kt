@@ -100,12 +100,15 @@ fun ProjectCreationScreen(navController: NavController) {
 
         // Tombol untuk upload proposal
         Text("Upload Proposal")
-        Button(onClick = {
-            // Implementasikan fungsi file picker di sini
-            Toast.makeText(context, "Fungsi upload belum diimplementasikan", Toast.LENGTH_SHORT).show()
-        }) {
-            Text("Pilih Proposal")
-        }
+
+            Button(onClick = {
+                Toast.makeText(context, "Fungsi upload belum diimplementasikan", Toast.LENGTH_SHORT).show()
+            }) {
+                Text("Upload Proposal")
+            }
+
+
+
 
         Spacer(modifier = Modifier.height(32.dp))
 
