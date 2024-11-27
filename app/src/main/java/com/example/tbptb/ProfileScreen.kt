@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavController
 import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun ProfileScreen(navController: NavController) {
@@ -29,6 +30,7 @@ fun ProfileScreen(navController: NavController) {
     var username by remember { mutableStateOf("Rahma") }
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+    var showChangePasswordDialog by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -109,6 +111,31 @@ fun ProfileScreen(navController: NavController) {
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
             Text("Update Profile")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Tombol Ubah Password
+        Button(
+            onClick = { showChangePasswordDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+        ) {
+            Text("Ubah Password")
+        }
+
+        if (showChangePasswordDialog) {
+            ChangePasswordDialog(
+                onDismiss = { showChangePasswordDialog = false },
+                onPasswordChange = { oldPassword, newPassword, confirmPassword ->
+                    if (newPassword == confirmPassword) {
+                        println("Password berhasil diubah")
+                    } else {
+                        println("Konfirmasi password tidak cocok")
+                    }
+                    showChangePasswordDialog = false
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
