@@ -20,9 +20,8 @@ import androidx.compose.ui.graphics.Color
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CollaboratorScreen(navController: NavController) {
-    val emailInput = remember { mutableStateOf("") }
-    val emailList = remember { mutableStateListOf<String>() }
-    var emailError by remember { mutableStateOf(false) }
+    val emailList = remember { mutableStateListOf<String>() } // Daftar email collaborator
+    val invitationsList = remember { mutableStateListOf<String>() } // Daftar undangan yang masuk
 
     Scaffold(
         topBar = {
@@ -43,75 +42,58 @@ fun CollaboratorScreen(navController: NavController) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Title
-            Text(
-                text = "Add Collaborator Email",
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-
-            // Email Input Field
-            OutlinedTextField(
-                value = emailInput.value,
-                onValueChange = { emailInput.value = it },
-                label = { Text("Enter Email") },
-                isError = emailError,
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF469C8F),
-                    cursorColor = Color(0xFF469C8F),
-                    errorBorderColor = Color.Red
-                )
-            )
-
-            // Error Message
-            if (emailError) {
-                Text(
-                    text = "Please enter a valid email",
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            // Add Collaborator Button
+            // Tombol untuk menampilkan daftar undangan
             Button(
                 onClick = {
-                    val email = emailInput.value
-                    if (email.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                        emailList.add(email)
-                        emailInput.value = "" // Reset email input field
-                        emailError = false
-                    } else {
-                        emailError = true // Show error if invalid email
-                    }
+                    // Tampilkan daftar undangan
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
             ) {
-                Text("Add Collaborator", color = Color.White)
+                Text("Undangan", color = Color.White)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Tombol untuk menampilkan form tambah collaborator
+            Button(
+                onClick = {
+                    // Navigasi ke halaman AddCollaboratorScreen
+                    navController.navigate("addCollaboratorScreen")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+            ) {
+                Text("Tambah Collaborator", color = Color.White)
+            }
 
-            // Collaborator List Title
-            Text(
-                text = "Collaborator List",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
 
-            // Displaying the List of Collaborators (Emails)
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(emailList) { email ->
+
+            LazyColumn(modifier = Modifier.fillMaxHeight()) {
+                items(invitationsList) { invitation ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
                     ) {
-                        Text(
-                            text = email,
-                            modifier = Modifier.padding(8.dp),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = invitation,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Button(
+                                onClick = {
+                                    invitationsList.remove(invitation)
+                                    emailList.add(invitation)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                            ) {
+                                Text("Approve", color = Color.White)
+                            }
+                        }
                     }
                 }
             }

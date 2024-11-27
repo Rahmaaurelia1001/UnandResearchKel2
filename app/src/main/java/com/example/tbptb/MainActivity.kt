@@ -51,8 +51,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TBPTBTheme {
                 val navController = rememberNavController()
-                val projects = remember { mutableStateListOf<Project>()}
-
+                val projects = remember { mutableStateListOf<Project>() }
 
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
@@ -77,12 +76,18 @@ class MainActivity : ComponentActivity() {
                                 projects.add(newProject) // Menambahkan proyek baru ke daftar
                             }
                         )
-                       }
+                    }
+
+                    // Menambahkan navigasi ke AddCollaboratorScreen
+                    composable("addCollaboratorScreen") {
+                        AddCollaboratorScreen(navController = navController)
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun SplashScreen(navController: NavController) {
