@@ -3,6 +3,7 @@
 package com.example.tbptb
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -41,10 +42,25 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.border
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
+import com.example.tbptb.data.AuthRequest
+import com.example.tbptb.data.AuthResponse
+import com.example.tbptb.network.ApiClient
+import com.example.tbptb.network.ApiService
+import android.util.Log
 import com.example.tbptb.ui.theme.UpdateProfile
+import com.example.tbptb.viewmodel.LoginViewModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import androidx.lifecycle.viewmodel.compose.viewModel
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import android.content.Context
+import android.content.SharedPreferences
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +69,15 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val projects = remember { mutableStateListOf<Project>() }
 
+                // Setup NavHost untuk menavigasi antar layar
                 NavHost(navController = navController, startDestination = "splash") {
                     composable("splash") { SplashScreen(navController) }
                     composable("main") { MainContent(navController) }
-                    composable("login") { LoginScreen(navController) }
+                    composable("login") {
+                        // Menambahkan ViewModel untuk LoginScreen
+                        val loginViewModel: LoginViewModel = viewModel()
+                        LoginScreen(navController = navController, loginViewModel = loginViewModel)
+                    }
                     composable("signup") { SignUpScreen(navController) }
                     composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
@@ -87,7 +108,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -173,10 +193,22 @@ fun MainContent(navController: NavController) {
 
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
+
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
+    // Tambahkan konteks untuk Toast
+    val context = LocalContext.current
+
+    // Buat instance AuthApi
+    val authApi = ApiClient.retrofit.create(ApiService::class.java)
+    fun saveToken(context: Context, token: String) {
+        val sharedPreferences: SharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("USER_TOKEN", token) // Menyimpan token
+        editor.apply() // Menyimpan perubahan
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -198,7 +230,6 @@ fun LoginScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -214,7 +245,6 @@ fun LoginScreen(navController: NavController) {
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = "Login",
@@ -264,7 +294,32 @@ fun LoginScreen(navController: NavController) {
                     Button(
                         onClick = {
                             if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                                navController.navigate("Dashboard")
+                                val request = AuthRequest(email.value, password.value)
+                                authApi.login(request).enqueue(object : Callback<AuthResponse> {
+                                    override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                                        if (response.isSuccessful) {
+                                            val body = response.body()
+                                            if (body?.message == "User logged in successfully" && body.data?.token != null) {
+                                                val token = body.data.token
+                                                saveToken(context, token)
+                                                navController.navigate("Dashboard")
+                                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                // Jika token null atau message tidak sesuai
+                                                Toast.makeText(context, "Login Failed: ${body?.message ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        } else {
+                                            // Jika respons tidak berhasil
+                                            Toast.makeText(context, "Login Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+
+                                    override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
+                                        Toast.makeText(context, "Login Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                                    }
+                                })
+                            } else {
+                                Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier
@@ -644,3 +699,11 @@ fun MainContentPreview() {
         MainContent(navController = rememberNavController())
     }
 }
+
+
+@Composable
+fun MyApp(navController: NavController) {
+    val loginViewModel: LoginViewModel = viewModel()
+    LoginScreen(navController = navController, loginViewModel = loginViewModel)
+}
+
