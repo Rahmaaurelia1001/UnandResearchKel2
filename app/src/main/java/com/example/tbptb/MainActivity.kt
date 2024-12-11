@@ -214,6 +214,7 @@ fun MainContent(navController: NavController) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 

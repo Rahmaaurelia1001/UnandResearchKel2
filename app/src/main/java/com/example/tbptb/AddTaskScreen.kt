@@ -2,9 +2,9 @@ package com.example.tbptb
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,15 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.CheckCircle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,10 +33,9 @@ fun AddTaskScreen(navController: NavController) {
     var taskAssignee by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
-    var showAddTaskForm by remember { mutableStateOf(false) }
-    var taskToEdit by remember { mutableStateOf<Task?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
-    val tasks = remember { mutableStateListOf<Task>() }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -53,283 +49,83 @@ fun AddTaskScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        if (showAddTaskForm || taskToEdit != null) {
-            // Form tambah atau edit task
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFF5F5F5))
-                    .padding(16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(Color.White, RoundedCornerShape(16.dp))
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            text = if (taskToEdit == null) "Tambahkan Task" else "Edit Task",
-                            style = MaterialTheme.typography.headlineSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 24.sp
-                            ),
-                            color = Color.Black
-                        )
-
-                        TaskInputField(
-                            label = "Judul",
-                            value = taskName,
-                            onValueChange = { taskName = it }
-                        )
-
-                        TaskInputField(
-                            label = "Deskripsi",
-                            value = taskDescription,
-                            onValueChange = { taskDescription = it },
-                            height = 100.dp
-                        )
-
-                        TaskInputField(
-                            label = "Penanggung Jawab",
-                            value = taskAssignee,
-                            onValueChange = { taskAssignee = it }
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Deadline: ${taskDeadlineDate?.let { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it) } ?: "Pilih Tanggal"}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Button(
-                                onClick = { showDatePicker = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
-                            ) {
-                                Text("Pilih Tanggal", color = Color.White)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Waktu: $taskDeadlineTime",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Button(
-                                onClick = { showTimePicker = true },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
-                            ) {
-                                Text("Pilih Waktu", color = Color.White)
-                            }
-                        }
-
-                        Button(
-                            onClick = {
-                                if (taskName.isNotBlank() && taskAssignee.isNotBlank()) {
-                                    if (taskToEdit != null) {
-                                        // Update task yang sedang diedit
-                                        tasks.remove(taskToEdit) // Hapus task lama
-                                        tasks.add(
-                                            Task(
-                                                name = taskName,
-                                                description = taskDescription,
-                                                deadline = "${taskDeadlineDate?.let { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it) }} $taskDeadlineTime",
-                                                assignee = taskAssignee
-                                            )
-                                        )
-                                    } else {
-                                        // Tambah task baru
-                                        tasks.add(
-                                            Task(
-                                                name = taskName,
-                                                description = taskDescription,
-                                                deadline = "${taskDeadlineDate?.let { SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it) }} $taskDeadlineTime",
-                                                assignee = taskAssignee
-                                            )
-                                        )
-                                    }
-                                    taskName = ""
-                                    taskDescription = ""
-                                    taskDeadlineDate = null
-                                    taskDeadlineTime = "00:00"
-                                    taskAssignee = ""
-                                    taskToEdit = null // Reset task yang sedang diedit
-                                    showAddTaskForm = false // Kembali ke daftar task
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F)),
-                            shape = RoundedCornerShape(50)
-                        ) {
-                            Text("Simpan Task", color = Color.White)
-                        }
-                    }
-                }
-            }
-        } else {
-            // Tampilkan daftar task
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFF5F5F5))
-                    .padding(paddingValues)
-            ) {
-                Button(
-                    onClick = { showAddTaskForm = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F)),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text("Tambah Task", color = Color.White)
-                }
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(tasks.size) { index ->
-                        val task = tasks[index]
-                        val cardColor = if (index % 2 == 0) Color(0xFFDFFBE9) else Color(0xFF5AB19F) // Warna hijau muda dan hijau tua
-                        TaskCard(
-                            task = task,
-                            cardColor = cardColor,
-                            onEditClick = {
-                                taskToEdit = task
-                                taskName = task.name
-                                taskDescription = task.description
-                                taskAssignee = task.assignee
-
-                                // Tangani parsing tanggal dengan aman
-                                try {
-                                    val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).parse(task.deadline.split(" ")[0])
-                                    taskDeadlineDate = date
-                                } catch (e: Exception) {
-                                    taskDeadlineDate = null // Default jika parsing gagal
-                                }
-
-                                taskDeadlineTime = task.deadline.split(" ").getOrElse(1) { "00:00" } // Default jika waktu tidak tersedia
-                                showAddTaskForm = true
-                            }
-                            ,
-                            onDeleteClick = {
-                                tasks.remove(task)
-                            },
-                            onMarkCompleted = {
-                                tasks[index] = task.copy(deadline = "${task.deadline} - Completed")
-                            }
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    // Date Picker Dialog
-    if (showDatePicker) {
-        val calendar = Calendar.getInstance()
-        DatePickerDialog(
-            LocalContext.current,
-            { _, year, month, dayOfMonth ->
-                taskDeadlineDate = Calendar.getInstance().apply {
-                    set(year, month, dayOfMonth)
-                }.time
-                showDatePicker = false
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        ).show()
-    }
-
-    // Time Picker Dialog
-    if (showTimePicker) {
-        val calendar = Calendar.getInstance()
-        TimePickerDialog(
-            LocalContext.current,
-            { _, hourOfDay, minute ->
-                taskDeadlineTime = String.format("%02d:%02d", hourOfDay, minute)
-                showTimePicker = false
-            },
-            calendar.get(Calendar.HOUR_OF_DAY),
-            calendar.get(Calendar.MINUTE),
-            true
-        ).show()
-    }
-}
-
-@Composable
-fun TaskCard(
-    task: Task,
-    cardColor: Color,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onMarkCompleted: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(cardColor, RoundedCornerShape(8.dp))
-            .padding(16.dp)
-    ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Nama: ${task.name}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-            Text("Deskripsi: ${task.description}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-            Text("Deadline: ${task.deadline}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-            Text("Penanggung Jawab: ${task.assignee}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-        }
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.End
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(Color(0xFFF5F5F5))
+                .padding(16.dp)
         ) {
-            IconButton(onClick = onEditClick) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Task", tint = Color(0xFF1E88E5))
-            }
-            IconButton(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete Task", tint = Color.Red)
-            }
-            IconButton(onClick = onMarkCompleted) {
-                Icon(Icons.Default.CheckCircle, contentDescription = "Mark Completed", tint = Color.Green)
+            // Form tambah task
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White, RoundedCornerShape(16.dp))
+                    .padding(24.dp)
+            ) {
+                Text(
+                    text = "Tambahkan Task",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                )
+
+                TaskInputField(label = "Judul", value = taskName, onValueChange = { taskName = it })
+                TaskInputField(label = "Deskripsi", value = taskDescription, onValueChange = { taskDescription = it })
+                TaskInputField(label = "Penanggung Jawab", value = taskAssignee, onValueChange = { taskAssignee = it })
+
+                Button(
+                    onClick = { showDatePicker = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
+                ) {
+                    Text("Pilih Tanggal", color = Color.White)
+                }
+
+                Button(
+                    onClick = {
+                        isLoading = true
+                        val task = Task(
+                            name = taskName,
+                            description = taskDescription,
+                            deadline = taskDeadlineDate?.let { SimpleDateFormat("yyyy-MM-dd").format(it) } ?: "",
+                            assignee = taskAssignee
+                        )
+
+                        coroutineScope.launch {
+                            try {
+                                val response = ApiClient.apiService.addTask(task)
+                                if (response.isSuccessful) {
+                                    Toast.makeText(navController.context, "Task berhasil disimpan", Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack()
+                                } else {
+                                    Toast.makeText(navController.context, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(navController.context, "Kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
+                            } finally {
+                                isLoading = false
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F)),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Simpan Task", color = Color.White)
+                }
             }
         }
     }
 }
 
 @Composable
-fun TaskInputField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    height: Dp = 56.dp
-) {
+fun TaskInputField(label: String, value: String, onValueChange: (String) -> Unit) {
     Column {
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+        Text(label, style = MaterialTheme.typography.bodyMedium)
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(height)
-                .background(Color.White, RoundedCornerShape(8.dp))
+                .background(Color(0xFFEFEFEF), RoundedCornerShape(8.dp))
                 .padding(8.dp)
         )
     }

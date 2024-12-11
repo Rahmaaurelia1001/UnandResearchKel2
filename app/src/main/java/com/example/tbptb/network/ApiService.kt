@@ -6,6 +6,8 @@ import com.example.tbptb.data.CollaboratorResponse
 import com.example.tbptb.data.RegisterRequest
 import com.example.tbptb.data.RegisterResponse
 import com.example.tbptb.data.RequestCollaborator
+import com.example.tbptb.data.Task
+import com.example.tbptb.data.TaskResponse
 import com.example.tbptb.data.UpdatePasswordRequest
 import com.example.tbptb.data.UpdateResponse
 import retrofit2.Call
@@ -29,5 +31,8 @@ interface ApiService {
 
     @POST("/api/project/collaborators")
     fun requestCollaborator(@Body request: RequestCollaborator): Call<CollaboratorResponse>
+
+    @POST("api/task")
+    fun addTask(@Body task: Task): Call<TaskResponse>
 }
 
