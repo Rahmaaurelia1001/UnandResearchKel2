@@ -54,12 +54,12 @@ fun AddTaskScreen(navController: NavController) {
         }
     ) { paddingValues ->
         if (showAddTaskForm || taskToEdit != null) {
-            // Form untuk tambah atau edit task
+            // Form tambah atau edit task
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color(0xFFF5F5F5))
-                    .padding(16.dp) // Padding yang lebih baik di seluruh layar
+                    .padding(16.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -139,7 +139,7 @@ fun AddTaskScreen(navController: NavController) {
                                 if (taskName.isNotBlank() && taskAssignee.isNotBlank()) {
                                     if (taskToEdit != null) {
                                         // Update task yang sedang diedit
-                                        tasks.remove(taskToEdit) // Hapus task yang lama
+                                        tasks.remove(taskToEdit) // Hapus task lama
                                         tasks.add(
                                             Task(
                                                 name = taskName,
@@ -216,10 +216,19 @@ fun AddTaskScreen(navController: NavController) {
                                 taskName = task.name
                                 taskDescription = task.description
                                 taskAssignee = task.assignee
-                                taskDeadlineDate = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).parse(task.deadline.split(" ")[0])
-                                taskDeadlineTime = task.deadline.split(" ")[1]
+
+                                // Tangani parsing tanggal dengan aman
+                                try {
+                                    val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).parse(task.deadline.split(" ")[0])
+                                    taskDeadlineDate = date
+                                } catch (e: Exception) {
+                                    taskDeadlineDate = null // Default jika parsing gagal
+                                }
+
+                                taskDeadlineTime = task.deadline.split(" ").getOrElse(1) { "00:00" } // Default jika waktu tidak tersedia
                                 showAddTaskForm = true
-                            },
+                            }
+                            ,
                             onDeleteClick = {
                                 tasks.remove(task)
                             },
@@ -286,26 +295,20 @@ fun TaskCard(
             Text("Deadline: ${task.deadline}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
             Text("Penanggung Jawab: ${task.assignee}", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
         }
-
-        // Menempatkan ikon di kanan bawah dengan sedikit spasi
         Row(
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(8.dp) // Mengatur jarak dari sisi bawah dan kanan
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.End
         ) {
-            // Tombol edit (warna biru)
             IconButton(onClick = onEditClick) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Task", tint = Color(0xFF1E88E5)) // Biru
+                Icon(Icons.Default.Edit, contentDescription = "Edit Task", tint = Color(0xFF1E88E5))
             }
-
-            // Tombol delete (warna merah)
             IconButton(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete Task", tint = Color(0xFFE53935)) // Merah
+                Icon(Icons.Default.Delete, contentDescription = "Delete Task", tint = Color.Red)
             }
-
-            // Tombol mark completed (warna hijau)
             IconButton(onClick = onMarkCompleted) {
-                Icon(Icons.Default.CheckCircle, contentDescription = "Mark as Completed", tint = Color(0xFF43A047)) // Hijau
+                Icon(Icons.Default.CheckCircle, contentDescription = "Mark Completed", tint = Color.Green)
             }
         }
     }
@@ -316,31 +319,22 @@ fun TaskInputField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    height: Dp = 56.dp,
-    isClickable: Boolean = false
+    height: Dp = 56.dp
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height)
-            .background(Color(0xFFE0F2F1))
-            .padding(16.dp)
-    ) {
-        if (isClickable) {
-            Text(text = value, color = Color.Gray, style = MaterialTheme.typography.bodyMedium)
-        } else {
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                singleLine = true,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+    Column {
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height)
+                .background(Color.White, RoundedCornerShape(8.dp))
+                .padding(8.dp)
+        )
     }
 }
 
-// Model data untuk task
 data class Task(
     val name: String,
     val description: String,
