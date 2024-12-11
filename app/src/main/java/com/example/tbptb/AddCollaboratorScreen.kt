@@ -1,5 +1,7 @@
 package com.example.tbptb
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,16 +12,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tbptb.viewmodel.CollaboratorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddCollaboratorScreen(navController: NavController) {
+fun AddCollaboratorScreen(navController: NavController, token: String ) {
     val emailInput = remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf(false) }
     val emailList = remember { mutableStateListOf<String>() }
+    val collaboratorViewModel: CollaboratorViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -52,7 +58,6 @@ fun AddCollaboratorScreen(navController: NavController) {
                 value = emailInput.value,
                 onValueChange = { emailInput.value = it },
                 label = { Text("Enter Email") },
-                isError = emailError,
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -63,13 +68,13 @@ fun AddCollaboratorScreen(navController: NavController) {
             )
 
             // Error Message for invalid email
-            if (emailError) {
-                Text(
-                    text = "Please enter a valid email",
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+//            if (emailError) {
+//                Text(
+//                    text = "Please enter a valid email",
+//                    color = Color.Red,
+//                    style = MaterialTheme.typography.bodySmall
+//                )
+//            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -77,13 +82,26 @@ fun AddCollaboratorScreen(navController: NavController) {
             Button(
                 onClick = {
                     val email = emailInput.value
-                    if (email.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                        emailList.add(email) // Add email to collaborator list
-                        emailInput.value = "" // Reset input field
-                        emailError = false
-                    } else {
-                        emailError = true // Show error if email is invalid
-                    }
+//                    if (email.isNotBlank()) {
+                        val collaboratorList = email.split(",").map { it.trim() }
+                        // Call ViewModel to add collaborator via API
+                        collaboratorViewModel.requestCollaborator(
+                            projectId = "98021b9f-a447-4e6b-a951-a2dd5075ae4f",
+                            collaboratorEmail = collaboratorList,
+                            token = token,
+                            onResult = { success, message ->
+                                if (success) {
+                                    emailList.add(email) // Add email to collaborator list
+                                    emailInput.value = "" // Reset input field
+                                    emailError = false
+                                } else {
+                                    emailError = true // Show error if failed
+                                }
+                            }
+                        )
+//                    } else {
+//                        emailError = true // Show error if email is invalid
+//                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))

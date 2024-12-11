@@ -50,15 +50,18 @@ import com.example.tbptb.network.ApiService
 import android.util.Log
 import com.example.tbptb.ui.theme.UpdateProfile
 import com.example.tbptb.viewmodel.LoginViewModel
+import com.example.tbptb.viewmodel.SignupViewModel
 import retrofit2.Call
 import retrofit2.Callback
+import androidx.compose.ui.unit.sp
 import retrofit2.Response
 import androidx.lifecycle.viewmodel.compose.viewModel
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
 import android.content.SharedPreferences
-
+import com.example.tbptb.data.RegisterRequest
+import androidx.compose.ui.text.TextStyle
 
 
 class MainActivity : ComponentActivity() {
@@ -68,6 +71,8 @@ class MainActivity : ComponentActivity() {
             TBPTBTheme {
                 val navController = rememberNavController()
                 val projects = remember { mutableStateListOf<Project>() }
+                val authApi = ApiClient.retrofit.create(ApiService::class.java)
+                val context = LocalContext.current
 
                 // Setup NavHost untuk menavigasi antar layar
                 NavHost(navController = navController, startDestination = "splash") {
@@ -78,18 +83,23 @@ class MainActivity : ComponentActivity() {
                         val loginViewModel: LoginViewModel = viewModel()
                         LoginScreen(navController = navController, loginViewModel = loginViewModel)
                     }
-                    composable("signup") { SignUpScreen(navController) }
+                    composable("signup") {
+                        val signupViewModel: SignupViewModel =
+                            viewModel()  // Perhatikan nama variabel ini
+                        SignUpScreen(navController = navController, viewModel = signupViewModel)
+                    }
                     composable("dashboard") { DashboardScreen(navController) }
                     composable("add_task") { AddTaskScreen(navController) }
                     composable("Collaborator") { CollaboratorScreen(navController) }
-                    composable("profile") { ProfileScreen(navController) }
-                    composable("update_profile") { UpdateProfile() }
-                    composable("ProjectScreen") {
-                        ProjectScreen(
+                    composable("profile") {
+                        ProfileScreen(
                             navController = navController,
-                            projects = projects // Meneruskan daftar proyek ke ProjectScreen
+                            authApi = authApi,
+                            context = context
                         )
                     }
+                    composable("update_profile") { UpdateProfile() }
+
                     composable("Buat_Project") {
                         ProjectCreationScreen(
                             navController = navController,
@@ -101,7 +111,18 @@ class MainActivity : ComponentActivity() {
 
                     // Menambahkan navigasi ke AddCollaboratorScreen
                     composable("addCollaboratorScreen") {
-                        AddCollaboratorScreen(navController = navController)
+                        val context = LocalContext.current
+                        val sharedPreferences =
+                            context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+                        val token = sharedPreferences.getString("token", "");
+
+                        if (token != null) {
+                            if (token.isNotEmpty()) {
+                                AddCollaboratorScreen(navController = navController, token = token)
+                            }else{
+                                Toast.makeText(context, "token tidak ditemukan", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             }
@@ -204,9 +225,10 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
     // Buat instance AuthApi
     val authApi = ApiClient.retrofit.create(ApiService::class.java)
     fun saveToken(context: Context, token: String) {
-        val sharedPreferences: SharedPreferences = context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences: SharedPreferences =
+            context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("USER_TOKEN", token) // Menyimpan token
+        editor.putString("token", token) // Menyimpan token
         editor.apply() // Menyimpan perubahan
     }
     Box(
@@ -296,30 +318,53 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
                             if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
                                 val request = AuthRequest(email.value, password.value)
                                 authApi.login(request).enqueue(object : Callback<AuthResponse> {
-                                    override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                                    override fun onResponse(
+                                        call: Call<AuthResponse>,
+                                        response: Response<AuthResponse>
+                                    ) {
                                         if (response.isSuccessful) {
                                             val body = response.body()
                                             if (body?.message == "User logged in successfully" && body.data?.token != null) {
                                                 val token = body.data.token
                                                 saveToken(context, token)
                                                 navController.navigate("Dashboard")
-                                                Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "Login Successful",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             } else {
                                                 // Jika token null atau message tidak sesuai
-                                                Toast.makeText(context, "Login Failed: ${body?.message ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "Login Failed: ${body?.message ?: "Unknown error"}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         } else {
                                             // Jika respons tidak berhasil
-                                            Toast.makeText(context, "Login Failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "Login Failed: ${response.message()}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
 
                                     override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
-                                        Toast.makeText(context, "Login Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Login Error: ${t.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 })
                             } else {
-                                Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Please enter email and password",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         },
                         modifier = Modifier
@@ -348,11 +393,14 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel) {
 
 
 @Composable
-fun SignUpScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController, viewModel: SignupViewModel) {
     val name = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
+    val isLoading = remember { mutableStateOf(false) } // Untuk menampilkan indikator loading
+    val errorMessage = remember { mutableStateOf("") } // Untuk menampilkan pesan error
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -363,7 +411,7 @@ fun SignUpScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.80f) // Mengisi 85% dari tinggi layar
+                .fillMaxHeight(0.80f) // Mengisi 80% dari tinggi layar
                 .background(
                     color = Color.White,
                     shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
@@ -392,7 +440,7 @@ fun SignUpScreen(navController: NavController) {
                     label = { Text("Name") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Transparent), // Menghapus latar belakang
+                        .background(Color.Transparent),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent, // Latar belakang transparan
                         focusedIndicatorColor = Color.Gray, // Warna garis saat fokus
@@ -453,15 +501,39 @@ fun SignUpScreen(navController: NavController) {
                     )
                 )
 
+                // Error message jika password tidak cocok
+                if (errorMessage.value.isNotEmpty()) {
+                    Text(
+                        text = errorMessage.value,
+                        color = Color.Red,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Red
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 Spacer(modifier = Modifier.height(120.dp))
 
                 // Tombol "Create Account"
                 Button(
                     onClick = {
                         if (password.value == confirmPassword.value) {
-
+                            val registerRequest = RegisterRequest(
+                                name = name.value,
+                                email = email.value,
+                                password = password.value
+                            )
+                            isLoading.value = true
+                            viewModel.register(
+                                registerRequest,
+                                navController,
+                                context
+                            ) // Kirimkan registerRequest di sini
                         } else {
-                            // Tampilkan pesan error
+                            errorMessage.value = "Passwords do not match."
                         }
                     },
                     modifier = Modifier
@@ -469,12 +541,17 @@ fun SignUpScreen(navController: NavController) {
                         .height(50.dp), // Tinggi tombol sesuai desain
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
                 ) {
-                    Text("Create Account", color = Color.White)
+                    if (isLoading.value) {
+                        CircularProgressIndicator(color = Color.White) // Indikator loading
+                    } else {
+                        Text("Create Account", color = Color.White)
+                    }
                 }
             }
         }
     }
 }
+
 @Composable
 fun DashboardScreen(navController: NavController) {
     Column(
@@ -542,7 +619,7 @@ fun DashboardScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate("Buat_Project")},
+            onClick = { navController.navigate("Buat_Project") },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
@@ -599,19 +676,37 @@ fun DashboardScreen(navController: NavController) {
                 tonalElevation = 0.dp // Hindari efek elevasi default
             ) {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Group, contentDescription = "Collaborator", tint = Color(0xFF469C8F)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Group,
+                            contentDescription = "Collaborator",
+                            tint = Color(0xFF469C8F)
+                        )
+                    },
                     label = { Text("Collaborator", color = Color(0xFF469C8F)) },
                     selected = false,
                     onClick = { navController.navigate("Collaborator") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Check, contentDescription = "Task", tint = Color(0xFF469C8F)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Check,
+                            contentDescription = "Task",
+                            tint = Color(0xFF469C8F)
+                        )
+                    },
                     label = { Text("Task", color = Color(0xFF469C8F)) },
                     selected = false,
                     onClick = { navController.navigate("add_task") }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Folder, contentDescription = "Project", tint = Color(0xFF469C8F)) },
+                    icon = {
+                        Icon(
+                            Icons.Default.Folder,
+                            contentDescription = "Project",
+                            tint = Color(0xFF469C8F)
+                        )
+                    },
                     label = { Text("Project", color = Color(0xFF469C8F)) },
                     selected = true,
                     onClick = { navController.navigate("ProjectScreen") }
@@ -666,7 +761,11 @@ fun ProjectCard(title: String, members: List<String>, progress: Int) {
                 modifier = Modifier.fillMaxWidth(),
                 color = Color.White
             )
-            Text("$progress% completed", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text(
+                "$progress% completed",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
+            )
         }
     }
 }
@@ -685,8 +784,16 @@ fun ProjectDetailsCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(title, style = MaterialTheme.typography.bodyMedium, color = Color.White)
             Text("Status: $status", style = MaterialTheme.typography.bodySmall, color = Color.White)
-            Text("Objek: $objectName", style = MaterialTheme.typography.bodySmall, color = Color.White)
-            Text("Collaborator: ${collaborators.joinToString()}", style = MaterialTheme.typography.bodySmall, color = Color.White)
+            Text(
+                "Objek: $objectName",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
+            )
+            Text(
+                "Collaborator: ${collaborators.joinToString()}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White
+            )
         }
     }
 }
@@ -706,4 +813,3 @@ fun MyApp(navController: NavController) {
     val loginViewModel: LoginViewModel = viewModel()
     LoginScreen(navController = navController, loginViewModel = loginViewModel)
 }
-

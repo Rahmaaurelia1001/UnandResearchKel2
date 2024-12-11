@@ -15,22 +15,21 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LoginViewModel : ViewModel() {
-    // Fungsi untuk melakukan login menggunakan Retrofit
+
     fun login(authRequest: AuthRequest, navController: NavController, context: Context) {
-        val authService = ApiClient.apiService // Sesuaikan dengan instance Retrofit Anda
+        val authService = ApiClient.apiService
         val call = authService.login(authRequest)
 
         call.enqueue(object : Callback<AuthResponse> {
             override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
                 if (response.isSuccessful) {
                     val body = response.body()
-                    // Pastikan body.data tidak null dan token ada
+
                     if (body?.data?.token != null) {
                         val token = body.data.token
-                        // Menyimpan token ke SharedPreferences atau tempat lain jika diperlukan
                         saveToken(context, token)
                         Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-                        navController.navigate("Dashboard") // Navigasi ke Dashboard
+                        navController.navigate("Dashboard")
                     } else {
                         Toast.makeText(context, "Login Failed: ${body?.message ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
                     }

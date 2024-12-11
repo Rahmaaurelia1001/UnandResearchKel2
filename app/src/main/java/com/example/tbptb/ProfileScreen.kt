@@ -1,5 +1,6 @@
 package com.example.tbptb
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,9 +24,14 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavController
 import androidx.compose.foundation.Image
 import androidx.compose.ui.draw.clip
+import com.example.tbptb.network.ApiService
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    authApi: ApiService,
+    context: Context
+) {
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
     var username by remember { mutableStateOf("Rahma") }
     var password by remember { mutableStateOf("") }
@@ -118,7 +124,7 @@ fun ProfileScreen(navController: NavController) {
             Text(
                 "Update Profile",
                 color = Color.White
-                )
+            )
         }
 
 
@@ -128,21 +134,18 @@ fun ProfileScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF469C8F))
         ) {
-            Text("Ubah Password",
-                    color = Color.White)
+            Text(
+                "Ubah Password",
+                color = Color.White
+            )
         }
+
 
         if (showChangePasswordDialog) {
             ChangePasswordDialog(
                 onDismiss = { showChangePasswordDialog = false },
-                onPasswordChange = { oldPassword, newPassword, confirmPassword ->
-                    if (newPassword == confirmPassword) {
-                        println("Password berhasil diubah")
-                    } else {
-                        println("Konfirmasi password tidak cocok")
-                    }
-                    showChangePasswordDialog = false
-                }
+                authApi = authApi,  // Kirim ApiService
+                context = context   // Kirim Context
             )
         }
 
